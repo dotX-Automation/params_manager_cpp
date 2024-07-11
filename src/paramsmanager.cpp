@@ -221,7 +221,7 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
     if (!data) {
       RCLCPP_INFO(
         node_->get_logger(),
-        "Manager::on_set_parameters_callback_: parameter '%s' unknown to this manager",
+        "Parameter '%s' unknown to manager",
         p.get_name().c_str());
       continue;
     }
@@ -230,7 +230,7 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
     if (static_cast<PType>(p.get_type()) != data->type_) {
       RCLCPP_ERROR(
         node_->get_logger(),
-        "Manager::on_set_parameters_callback_: parameter '%s' type mismatch",
+        "Parameter '%s' type mismatch",
         p.get_name().c_str());
       res.set__successful(false);
       res.set__reason("Parameter '" + p.get_name() + "' type mismatch");
@@ -268,7 +268,7 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
           *static_cast<std::vector<std::string> *>(data->var_ptr_) = p.as_string_array();
           break;
         default:
-          RCLCPP_ERROR(node_->get_logger(), "Manager::on_set_parameters_callback_: unknown type");
+          RCLCPP_ERROR(node_->get_logger(), "Unknown parameter type");
           break;
       }
     }
@@ -277,7 +277,7 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
     if (data->validator_ && !data->validator_(p)) {
       RCLCPP_ERROR(
         node_->get_logger(),
-        "Manager::on_set_parameters_callback_: parameter '%s' validation failed",
+        "Parameter '%s' validation failed",
         p.get_name().c_str());
       res.set__successful(false);
       res.set__reason("Parameter '" + p.get_name() + "' validation failed");
@@ -315,7 +315,7 @@ void Manager::declare_bool_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_bool_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -354,7 +354,7 @@ void Manager::declare_bool_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_bool_array_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -396,7 +396,7 @@ void Manager::declare_integer_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_int_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -443,7 +443,7 @@ void Manager::declare_integer_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_int_array_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -490,7 +490,7 @@ void Manager::declare_double_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_double_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -537,8 +537,7 @@ void Manager::declare_double_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument(
-            "Manager::declare_double_array_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -582,7 +581,7 @@ void Manager::declare_string_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_string_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -621,8 +620,7 @@ void Manager::declare_string_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument(
-            "Manager::declare_string_array_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
@@ -661,7 +659,7 @@ void Manager::declare_byte_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("Manager::declare_byte_array_parameter: parameter already declared");
+    throw std::invalid_argument("Parameter already declared");
   }
 
   // Add parameter to the set
