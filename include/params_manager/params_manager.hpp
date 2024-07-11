@@ -42,7 +42,7 @@
 /* Function used to define a custom parameter validation procedure. */
 using Validator = std::function<bool (const rclcpp::Parameter &)>;
 
-namespace ParamsManager
+namespace params_manager
 {
 
 /* Keeps this library coherent with the ParameterType ROS message. */
@@ -97,14 +97,14 @@ struct PARAMS_MANAGER_LOCAL PMComparator
 /**
  * Simplifies interactions with the ROS 2 parameter API.
  */
-class PARAMS_MANAGER_PUBLIC PManager
+class PARAMS_MANAGER_PUBLIC Manager
 {
 public:
   /* Constructors. */
-  PManager(rclcpp::Node * node, bool verbose = false);
+  Manager(rclcpp::Node * node, bool verbose = false);
 
   /* Destructor. */
-  virtual ~PManager();
+  virtual ~Manager();
 
   /* Parameter declaration wrapper functions. */
   void declare_bool_parameter(
@@ -162,7 +162,7 @@ public:
     std::vector<uint8_t> * var = nullptr,
     Validator && validator = nullptr);
 
-  typedef std::shared_ptr<PManager> SharedPtr;
+  typedef std::shared_ptr<Manager> SharedPtr;
 
 private:
   /* Operational flags. */
@@ -192,6 +192,6 @@ private:
   void PARAMS_MANAGER_LOCAL log_update_(const rclcpp::Parameter & param);
 };
 
-} // namespace ParamsManager
+} // namespace params_manager
 
 #endif // PARAMS_MANAGER__PARAMSMANAGER_HPP_

@@ -11,7 +11,7 @@ The main problem of the `rclcpp` is the vast amount of boilerplate code required
 ## Limitations
 
 - Dynamic parameters, *i.e.*, parameters with dynamic typing, are not supported by design.
-- The `PManager` class also supports the `BYTE_ARRAY` parameter type, but dynamic code generation for it is not supported.
+- The `Manager` class also supports the `BYTE_ARRAY` parameter type, but dynamic code generation for it is not supported.
 
 ## Usage
 
@@ -19,9 +19,9 @@ Two sets of operations must be performed to implement node parameters for a node
 
 ### Modifying the node
 
-First, you must import the library in your node class, including the `params_manager.hpp` header file. Then you must declare a `PManager` object in your node class, and initialize it in the constructor, passing to it:
+First, you must import the library in your node class, including the `params_manager.hpp` header file. Then you must declare a `Manager` object in your node class, and initialize it in the constructor, passing to it:
 
-- the pointer to the node object that manages the `PManager`;
+- the pointer to the node object that manages the `Manager`;
 - a boolean flag that activates verbose logs upon events such as parameter updates.
 
 Keep in mind the name that you give to this object.
@@ -32,7 +32,7 @@ Second, you must define the following function as a member of your node class:
 void init_parameters();
 ```
 
-and call it in the constructor, better if it's the first thing being done after the `PManager` object is initialized.
+and call it in the constructor, better if it's the first thing being done after the `Manager` object is initialized.
 
 In case you want to perform a specific action when a specific parameter is updated, you must define a function member (*validator*) for your node with the following signature:
 
@@ -50,8 +50,8 @@ First, you have to add a YAML file to the source code of your node, something li
 
 ```yaml
 header_include_path: dir/node_header.hpp
-namespace: NodeNamespace # This is optional
-manager_name: pmanager # This is optional
+namespace: node_namespace # This is optional
+manager_name: manager # This is optional
 node_class_name: MyNode
 
 params:
@@ -143,7 +143,7 @@ params:
     validator: function_name # This is optional
 ```
 
-Only fields marked with appropriate comments in the above examples are optional, the rest are mandatory; in particular, each parameter must have a `type` and a `default_value` field, plus other mandatory field that depend on the parameter type; moreover, `var_name` must be the name of a class member variable that can, optionally, be reassigned in real time to the most up-to-date value of the parameter, so as to track it. Note that validator routine names, which can optionally be specified for each parameter, must match those that you may have defined as instructed in [Modifying the node](#modifying-the-node). The `manager_name` value must also match the name you gave to the `PManager` object in your node class, and it defaults to `pmanager_`.
+Only fields marked with appropriate comments in the above examples are optional, the rest are mandatory; in particular, each parameter must have a `type` and a `default_value` field, plus other mandatory field that depend on the parameter type; moreover, `var_name` must be the name of a class member variable that can, optionally, be reassigned in real time to the most up-to-date value of the parameter, so as to track it. Note that validator routine names, which can optionally be specified for each parameter, must match those that you may have defined as instructed in [Modifying the node](#modifying-the-node). The `manager_name` value must also match the name you gave to the `Manager` object in your node class, and it defaults to `manager_`.
 
 The idea is that this file is going to be used by a script to automatically generate code that calls various instances of the `declare_*_parameter` from the `rclcpp` API, which constitute much of the otherwise unavoidable boilerplate code. To do so, add the following lines to your `CMakeLists.txt` file:
 

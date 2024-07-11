@@ -25,7 +25,7 @@
 
 #include <params_manager/params_manager.hpp>
 
-namespace ParamsManager
+namespace params_manager
 {
 
 /**
@@ -37,30 +37,30 @@ namespace ParamsManager
  * @throws InvalidArgument if the node pointer is null.
  * @throws RuntimeError if callback setting fails.
  */
-PManager::PManager(rclcpp::Node * node, bool verbose)
+Manager::Manager(rclcpp::Node * node, bool verbose)
 : verbose_(verbose)
 {
   // Attach to node
   if (!node) {
-    throw std::invalid_argument("PManager::PManager: node pointer cannot be null");
+    throw std::invalid_argument("Manager::Manager: node pointer cannot be null");
   }
   node_ = node;
 
   // Set callback
   params_clbk_handle_ = node_->add_on_set_parameters_callback(
     std::bind(
-      &PManager::on_set_parameters_callback_,
+      &Manager::on_set_parameters_callback_,
       this,
       std::placeholders::_1));
   if (!params_clbk_handle_) {
-    throw std::runtime_error("PManager::PManager: callback setting failed");
+    throw std::runtime_error("Manager::Manager: callback setting failed");
   }
 }
 
 /**
  * Destructor.
  */
-PManager::~PManager()
+Manager::~Manager()
 {
   std::scoped_lock<std::mutex> lock(params_set_lock_);
   node_->remove_on_set_parameters_callback(params_clbk_handle_.get());
@@ -74,7 +74,7 @@ PManager::~PManager()
  *
  * @return Pointer to the parameter metadata, or null if not present.
  */
-std::shared_ptr<ParamData> PManager::get_param_data_(const std::string & name)
+std::shared_ptr<ParamData> Manager::get_param_data_(const std::string & name)
 {
   std::scoped_lock<std::mutex> lock(params_set_lock_);
 
@@ -93,7 +93,7 @@ std::shared_ptr<ParamData> PManager::get_param_data_(const std::string & name)
  * @param var_ptr Pointer to the variable to be updated.
  * @param validator External parameter validation routine.
  */
-void PManager::add_to_set_(
+void Manager::add_to_set_(
   const std::string & name,
   PType type,
   void * var_ptr,
@@ -110,9 +110,9 @@ void PManager::add_to_set_(
  *
  * @param p Parameter to be logged.
  */
-void PManager::log_update_(const rclcpp::Parameter & p)
+void Manager::log_update_(const rclcpp::Parameter & p)
 {
-  std::string msg = "PManager::log_update_: '" + p.get_name() + "': ";
+  std::string msg = "Manager::log_update_: '" + p.get_name() + "': ";
   switch (static_cast<PType>(p.get_type())) {
     case PType::PARAMETER_BOOL:
       msg += p.as_bool() ? "true" : "false";
@@ -206,7 +206,7 @@ void PManager::log_update_(const rclcpp::Parameter & p)
  *
  * @return SetParametersResult object to be forwarded to the ROS 2 parameters subsystem.
  */
-rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
+rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
   const std::vector<rclcpp::Parameter> & params)
 {
   // Initialize result object
@@ -221,7 +221,7 @@ rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
     if (!data) {
       RCLCPP_INFO(
         node_->get_logger(),
-        "PManager::on_set_parameters_callback_: parameter '%s' unknown to this manager",
+        "Manager::on_set_parameters_callback_: parameter '%s' unknown to this manager",
         p.get_name().c_str());
       continue;
     }
@@ -230,7 +230,7 @@ rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
     if (static_cast<PType>(p.get_type()) != data->type_) {
       RCLCPP_ERROR(
         node_->get_logger(),
-        "PManager::on_set_parameters_callback_: parameter '%s' type mismatch",
+        "Manager::on_set_parameters_callback_: parameter '%s' type mismatch",
         p.get_name().c_str());
       res.set__successful(false);
       res.set__reason("Parameter '" + p.get_name() + "' type mismatch");
@@ -268,7 +268,7 @@ rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
           *static_cast<std::vector<std::string> *>(data->var_ptr_) = p.as_string_array();
           break;
         default:
-          RCLCPP_ERROR(node_->get_logger(), "PManager::on_set_parameters_callback_: unknown type");
+          RCLCPP_ERROR(node_->get_logger(), "Manager::on_set_parameters_callback_: unknown type");
           break;
       }
     }
@@ -277,7 +277,7 @@ rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
     if (data->validator_ && !data->validator_(p)) {
       RCLCPP_ERROR(
         node_->get_logger(),
-        "PManager::on_set_parameters_callback_: parameter '%s' validation failed",
+        "Manager::on_set_parameters_callback_: parameter '%s' validation failed",
         p.get_name().c_str());
       res.set__successful(false);
       res.set__reason("Parameter '" + p.get_name() + "' validation failed");
@@ -306,7 +306,7 @@ rcl_interfaces::msg::SetParametersResult PManager::on_set_parameters_callback_(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_bool_parameter(
+void Manager::declare_bool_parameter(
   std::string && name,
   bool default_val,
   std::string && desc, std::string && constraints, bool read_only,
@@ -315,7 +315,7 @@ void PManager::declare_bool_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_bool_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_bool_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -345,7 +345,7 @@ void PManager::declare_bool_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_bool_array_parameter(
+void Manager::declare_bool_array_parameter(
   std::string && name,
   std::vector<bool> && default_val,
   std::string && desc, std::string && constraints, bool read_only,
@@ -354,7 +354,7 @@ void PManager::declare_bool_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_bool_array_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_bool_array_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -387,7 +387,7 @@ void PManager::declare_bool_array_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_integer_parameter(
+void Manager::declare_integer_parameter(
   std::string && name,
   int64_t default_val, int64_t from, int64_t to, int64_t step,
   std::string && desc, std::string && constraints, bool read_only,
@@ -396,7 +396,7 @@ void PManager::declare_integer_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_int_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_int_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -434,7 +434,7 @@ void PManager::declare_integer_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_integer_array_parameter(
+void Manager::declare_integer_array_parameter(
   std::string && name,
   std::vector<int64_t> && default_val, int64_t from, int64_t to, int64_t step,
   std::string && desc, std::string && constraints, bool read_only,
@@ -443,7 +443,7 @@ void PManager::declare_integer_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_int_array_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_int_array_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -481,7 +481,7 @@ void PManager::declare_integer_array_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_double_parameter(
+void Manager::declare_double_parameter(
   std::string && name,
   double default_val, double from, double to, double step,
   std::string && desc, std::string && constraints, bool read_only,
@@ -490,7 +490,7 @@ void PManager::declare_double_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_double_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_double_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -528,7 +528,7 @@ void PManager::declare_double_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_double_array_parameter(
+void Manager::declare_double_array_parameter(
   std::string && name,
   std::vector<double> && default_val, double from, double to, double step,
   std::string && desc, std::string && constraints, bool read_only,
@@ -538,7 +538,7 @@ void PManager::declare_double_array_parameter(
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
     throw std::invalid_argument(
-            "PManager::declare_double_array_parameter: parameter already declared");
+            "Manager::declare_double_array_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -573,7 +573,7 @@ void PManager::declare_double_array_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_string_parameter(
+void Manager::declare_string_parameter(
   std::string && name,
   std::string && default_val,
   std::string && desc, std::string && constraints, bool read_only,
@@ -582,7 +582,7 @@ void PManager::declare_string_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_string_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_string_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -612,7 +612,7 @@ void PManager::declare_string_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_string_array_parameter(
+void Manager::declare_string_array_parameter(
   std::string && name,
   std::vector<std::string> && default_val,
   std::string && desc, std::string && constraints, bool read_only,
@@ -622,7 +622,7 @@ void PManager::declare_string_array_parameter(
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
     throw std::invalid_argument(
-            "PManager::declare_string_array_parameter: parameter already declared");
+            "Manager::declare_string_array_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -652,7 +652,7 @@ void PManager::declare_string_array_parameter(
  *
  * @throws InvalidArgument if the parameter is already declared.
  */
-void PManager::declare_byte_array_parameter(
+void Manager::declare_byte_array_parameter(
   std::string && name,
   std::vector<uint8_t> && default_val,
   std::string && desc, std::string && constraints, bool read_only,
@@ -661,7 +661,7 @@ void PManager::declare_byte_array_parameter(
 {
   // Check if the parameter is not already present
   if (get_param_data_(name) != nullptr) {
-    throw std::invalid_argument("PManager::declare_byte_array_parameter: parameter already declared");
+    throw std::invalid_argument("Manager::declare_byte_array_parameter: parameter already declared");
   }
 
   // Add parameter to the set
@@ -678,4 +678,4 @@ void PManager::declare_byte_array_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-} // namespace ParamsManager
+} // namespace params_manager
