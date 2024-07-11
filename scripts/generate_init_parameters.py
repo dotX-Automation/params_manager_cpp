@@ -169,7 +169,6 @@ if __name__ == '__main__':
                 .replace('{{type}}', values['type'])\
                 .replace('{{param_name}}', param_name)\
                 .replace('{{param_values}}', param_values)\
-                .replace('{{description}}', values['description'])\
                 .replace('{{constraints}}', values['constraints'])\
                 .replace('{{manager_name}}', manager_name)\
                 .replace('{{validator}}', validator_subst)\
@@ -183,7 +182,10 @@ if __name__ == '__main__':
             print(f'Failed to parse configuration of parameter: {param_name}')
             exit(-1)
 
-    cpp_code = cpp_code.replace('{{params_declarations}}', params_decls_cpp[:-2])
+    if len(params_decls_cpp) > 0:
+        cpp_code = cpp_code.replace('{{params_declarations}}', params_decls_cpp[:-2])
+    else:
+        cpp_code = cpp_code.replace('{{params_declarations}}', '')
     cpp_code = cpp_code.replace('{{node_class_name}}', node_class_name)
     cpp_code = cpp_code.replace('{{header_include_path}}', header_include_path)
     if namespace != '':
