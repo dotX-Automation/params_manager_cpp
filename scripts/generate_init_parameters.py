@@ -123,24 +123,26 @@ if __name__ == '__main__':
                     .replace('{{max_value}}', str(values['max_value']))\
                     .replace('{{step}}', str(values['step']))
                 default_values = ''
-                for i in range(0, len(list(values['default_value'])) - 1):
-                    default_values += str(list(values['default_value'])[i]) + ', '
-                default_values += str(list(values['default_value'])[-1])
+                if len(list(values['default_value'])) > 0:
+                    for i in range(0, len(list(values['default_value'])) - 1):
+                        default_values += str(list(values['default_value'])[i]) + ', '
+                    default_values += str(list(values['default_value'])[-1])
                 param_values = param_values.replace('{{default_value}}', default_values)
             elif values['type'] in ['bool_array', 'string_array']:
                 default_values = ''
                 is_string = values['type'] == 'string_array'
-                for i in range(0, len(list(values['default_value'])) - 1):
+                if len(list(values['default_value'])) > 0:
+                    for i in range(0, len(list(values['default_value'])) - 1):
+                        default_values += '"' if is_string else ''
+                        default_values +=\
+                            str(list(values['default_value'])[i]) if is_string\
+                            else str(list(values['default_value'])[i]).lower()
+                        default_values += '", ' if is_string else ', '
                     default_values += '"' if is_string else ''
                     default_values +=\
-                        str(list(values['default_value'])[i]) if is_string\
-                        else str(list(values['default_value'])[i]).lower()
-                    default_values += '", ' if is_string else ', '
-                default_values += '"' if is_string else ''
-                default_values +=\
-                    str(list(values['default_value'])[-1]) if is_string\
-                    else str(list(values['default_value'])[-1]).lower()
-                default_values += '"' if is_string else ''
+                        str(list(values['default_value'])[-1]) if is_string\
+                        else str(list(values['default_value'])[-1]).lower()
+                    default_values += '"' if is_string else ''
                 param_values = defaults[values['type']].replace('{{default_value}}', default_values)
             else:  # bool, string
                 is_string = values['type'] == 'string'
