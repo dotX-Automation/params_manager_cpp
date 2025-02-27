@@ -19,14 +19,14 @@
 # limitations under the License.
 
 function(generate_init_parameters)
-  find_package(PythonInterp 3 REQUIRED)
+  find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
   ament_index_has_resource(
-    PARAMS_MANAGER_PREFIX
+    PARAMS_MANAGER_CPP_PREFIX
     packages
-    params_manager)
-  if(NOT PARAMS_MANAGER_PREFIX)
-    message(FATAL_ERROR "Could not find params_manager package")
+    params_manager_cpp)
+  if(NOT PARAMS_MANAGER_CPP_PREFIX)
+    message(FATAL_ERROR "Could not find params_manager_cpp package")
   endif()
 
   set(options "")
@@ -48,8 +48,8 @@ function(generate_init_parameters)
 
   add_custom_command(
     OUTPUT "${GENERATE_INIT_PARAMETERS_OUT_FILE}"
-    COMMAND ${PYTHON_EXECUTABLE}
-      "${PARAMS_MANAGER_PREFIX}/share/params_manager/scripts/generate_init_parameters.py"
+    COMMAND ${Python3_EXECUTABLE}
+      "${PARAMS_MANAGER_CPP_PREFIX}/share/params_manager_cpp/scripts/generate_init_parameters.py"
       "${GENERATE_INIT_PARAMETERS_YAML_FILE}"
       "${CMAKE_CURRENT_BINARY_DIR}/${GENERATE_INIT_PARAMETERS_OUT_FILE}"
     MAIN_DEPENDENCY "${GENERATE_INIT_PARAMETERS_YAML_FILE}"
