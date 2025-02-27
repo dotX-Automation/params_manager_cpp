@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(params_manager)
+project(params_manager_cpp)
 
 set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 

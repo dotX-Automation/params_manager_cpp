@@ -23,20 +23,11 @@
  * limitations under the License.
  */
 
-#include <params_manager/params_manager.hpp>
+#include <params_manager_cpp/params_manager.hpp>
 
 namespace params_manager
 {
 
-/**
- * Constructor.
- *
- * @param node Pointer to the node to which this manager is attached.
- * @param verbose Activates event logging.
- *
- * @throws InvalidArgument if the node pointer is null.
- * @throws RuntimeError if callback setting fails.
- */
 Manager::Manager(rclcpp::Node * node, bool verbose)
 : verbose_(verbose)
 {
@@ -57,9 +48,6 @@ Manager::Manager(rclcpp::Node * node, bool verbose)
   }
 }
 
-/**
- * Destructor.
- */
 Manager::~Manager()
 {
   std::scoped_lock<std::mutex> lock(params_set_lock_);
@@ -67,13 +55,6 @@ Manager::~Manager()
   params_set_.clear();
 }
 
-/**
- * @brief Returns the parameter metadata for the given paramenter name, if present.
- *
- * @param name Parameter name.
- *
- * @return Pointer to the parameter metadata, or null if not present.
- */
 std::shared_ptr<ParamData> Manager::get_param_data_(const std::string & name)
 {
   std::scoped_lock<std::mutex> lock(params_set_lock_);
@@ -85,14 +66,6 @@ std::shared_ptr<ParamData> Manager::get_param_data_(const std::string & name)
   return nullptr;
 }
 
-/**
- * @brief Adds a parameter to the parameter set.
- *
- * @param name Parameter name.
- * @param type Parameter type.
- * @param var_ptr Pointer to the variable to be updated.
- * @param validator External parameter validation routine.
- */
 void Manager::add_to_set_(
   const std::string & name,
   PType type,
@@ -105,11 +78,6 @@ void Manager::add_to_set_(
   params_set_.insert(std::pair<std::string, ParamData>(name, data));
 }
 
-/**
- * @brief Logs a parameter update event.
- *
- * @param p Parameter to be logged.
- */
 void Manager::log_update_(const rclcpp::Parameter & p)
 {
   std::string msg = "'" + p.get_name() + "': ";
@@ -199,13 +167,6 @@ void Manager::log_update_(const rclcpp::Parameter & p)
   RCLCPP_INFO(node_->get_logger(), msg.c_str());
 }
 
-/**
- * @brief Callback routine for parameter setting.
- *
- * @param params Parameters to be set.
- *
- * @return SetParametersResult object to be forwarded to the ROS 2 parameters subsystem.
- */
 rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
   const std::vector<rclcpp::Parameter> & params)
 {
@@ -293,19 +254,6 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
   return res;
 }
 
-/**
- * @brief Routine to declare a boolean node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_bool_parameter(
   std::string && name,
   bool default_val,
@@ -332,19 +280,6 @@ void Manager::declare_bool_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a boolean array node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_bool_array_parameter(
   std::string && name,
   std::vector<bool> && default_val,
@@ -371,22 +306,6 @@ void Manager::declare_bool_array_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare an integer node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param from Integer range initial value.
- * @param to Integer range final value.
- * @param step Integer range step.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Paramter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_integer_parameter(
   std::string && name,
   int64_t default_val, int64_t from, int64_t to, int64_t step,
@@ -418,22 +337,6 @@ void Manager::declare_integer_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare an integer array node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param from Integer range initial value.
- * @param to Integer range final value.
- * @param step Integer range step.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Paramter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_integer_array_parameter(
   std::string && name,
   std::vector<int64_t> && default_val, int64_t from, int64_t to, int64_t step,
@@ -465,22 +368,6 @@ void Manager::declare_integer_array_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a 64-bit floating point node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param from Floating point range initial value.
- * @param to Floating point range final value.
- * @param step Floating point range step.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_double_parameter(
   std::string && name,
   double default_val, double from, double to, double step,
@@ -512,22 +399,6 @@ void Manager::declare_double_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a 64-bit floating point array node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param from Floating point range initial value.
- * @param to Floating point range final value.
- * @param step Floating point range step.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_double_array_parameter(
   std::string && name,
   std::vector<double> && default_val, double from, double to, double step,
@@ -559,19 +430,6 @@ void Manager::declare_double_array_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a string node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_string_parameter(
   std::string && name,
   std::string && default_val,
@@ -598,19 +456,6 @@ void Manager::declare_string_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a string array node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_string_array_parameter(
   std::string && name,
   std::vector<std::string> && default_val,
@@ -637,19 +482,6 @@ void Manager::declare_string_array_parameter(
   node_->declare_parameter(name, default_val, descriptor);
 }
 
-/**
- * @brief Routine to declare a byte array node parameter.
- *
- * @param name Parameter name.
- * @param default_val Default value.
- * @param desc Parameter description.
- * @param constraints Additional value constraints.
- * @param read_only Read-only internal flag.
- * @param var Pointer to the variable to be updated.
- * @param validator Parameter validation routine.
- *
- * @throws InvalidArgument if the parameter is already declared.
- */
 void Manager::declare_byte_array_parameter(
   std::string && name,
   std::vector<uint8_t> && default_val,

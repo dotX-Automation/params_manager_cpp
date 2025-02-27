@@ -1,4 +1,4 @@
-# params_manager
+# params_manager_cpp
 
 Library to easily manage ROS 2 node parameters through the `rclcpp` C++ API.
 

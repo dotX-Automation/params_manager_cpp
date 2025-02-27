@@ -70,8 +70,19 @@ struct PARAMS_MANAGER_LOCAL ParamData
   Validator validator_ = nullptr;
   void * var_ptr_ = nullptr;
 
+  /**
+   * Constructor.
+   */
   ParamData() {}
 
+  /**
+   * Constructor.
+   *
+   * @param name Parameter name.
+   * @param type Parameter type.
+   * @param var_ptr Pointer to the variable to be updated.
+   * @param validator External parameter validation routine.
+   */
   ParamData(const std::string & name, PType type, void * var_ptr, const Validator & validator)
   {
     name_ = name;
@@ -100,61 +111,207 @@ struct PARAMS_MANAGER_LOCAL PMComparator
 class PARAMS_MANAGER_PUBLIC Manager
 {
 public:
-  /* Constructors. */
+  /**
+   * Constructor.
+   *
+   * @param node Pointer to the node to which this manager is attached.
+   * @param verbose Activates event logging.
+   *
+   * @throws InvalidArgument if the node pointer is null.
+   * @throws RuntimeError if callback setting fails.
+   */
   Manager(rclcpp::Node * node, bool verbose = false);
 
-  /* Destructor. */
+  /**
+   * Destructor.
+   */
   virtual ~Manager();
 
-  /* Parameter declaration wrapper functions. */
+  /**
+   * @brief Routine to declare a boolean node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_bool_parameter(
     std::string && name,
     bool default_val,
     std::string && desc, std::string && constraints, bool read_only,
     bool * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a boolean array node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_bool_array_parameter(
     std::string && name,
     std::vector<bool> && default_val,
     std::string && desc, std::string && constraints, bool read_only,
     std::vector<bool> * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare an integer node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param from Integer range initial value.
+   * @param to Integer range final value.
+   * @param step Integer range step.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Paramter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_integer_parameter(
     std::string && name,
     int64_t default_val, int64_t from, int64_t to, int64_t step,
     std::string && desc, std::string && constraints, bool read_only,
     int64_t * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare an integer array node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param from Integer range initial value.
+   * @param to Integer range final value.
+   * @param step Integer range step.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Paramter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_integer_array_parameter(
     std::string && name,
     std::vector<int64_t> && default_val, int64_t from, int64_t to, int64_t step,
     std::string && desc, std::string && constraints, bool read_only,
     std::vector<int64_t> * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a 64-bit floating point node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param from Floating point range initial value.
+   * @param to Floating point range final value.
+   * @param step Floating point range step.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_double_parameter(
     std::string && name,
     double default_val, double from, double to, double step,
     std::string && desc, std::string && constraints, bool read_only,
     double * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a 64-bit floating point array node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param from Floating point range initial value.
+   * @param to Floating point range final value.
+   * @param step Floating point range step.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_double_array_parameter(
     std::string && name,
     std::vector<double> && default_val, double from, double to, double step,
     std::string && desc, std::string && constraints, bool read_only,
     std::vector<double> * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a string node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_string_parameter(
     std::string && name,
     std::string && default_val,
     std::string && desc, std::string && constraints, bool read_only,
     std::string * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a string array node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_string_array_parameter(
     std::string && name,
     std::vector<std::string> && default_val,
     std::string && desc, std::string && constraints, bool read_only,
     std::vector<std::string> * var = nullptr,
     Validator && validator = nullptr);
+
+  /**
+   * @brief Routine to declare a byte array node parameter.
+   *
+   * @param name Parameter name.
+   * @param default_val Default value.
+   * @param desc Parameter description.
+   * @param constraints Additional value constraints.
+   * @param read_only Read-only internal flag.
+   * @param var Pointer to the variable to be updated.
+   * @param validator Parameter validation routine.
+   *
+   * @throws InvalidArgument if the parameter is already declared.
+   */
   void declare_byte_array_parameter(
     std::string && name,
     std::vector<uint8_t> && default_val,
@@ -177,18 +334,47 @@ private:
   /* Mutex used to protect the parameters set. */
   std::mutex params_set_lock_;
 
-  /* Parameters callback data. */
+  /* Parameters callback handle. */
   rclcpp::Node::OnSetParametersCallbackHandle::SharedPtr params_clbk_handle_ = nullptr;
+
+  /**
+   * @brief Callback routine for parameter setting.
+   *
+   * @param params Parameters to be set.
+   *
+   * @return SetParametersResult object to be forwarded to the ROS 2 parameters subsystem.
+   */
   rcl_interfaces::msg::SetParametersResult PARAMS_MANAGER_LOCAL on_set_parameters_callback_(
     const std::vector<rclcpp::Parameter> & params);
 
-  /* Internal routines */
+  /**
+   * @brief Adds a parameter to the parameter set.
+   *
+   * @param name Parameter name.
+   * @param type Parameter type.
+   * @param var_ptr Pointer to the variable to be updated.
+   * @param validator External parameter validation routine.
+   */
   void PARAMS_MANAGER_LOCAL add_to_set_(
     const std::string & name,
     PType type,
     void * var_ptr,
     const Validator & validator);
+
+  /**
+   * @brief Returns the parameter metadata for the given paramenter name, if present.
+   *
+   * @param name Parameter name.
+   *
+   * @return Pointer to the parameter metadata, or null if not present.
+   */
   std::shared_ptr<ParamData> PARAMS_MANAGER_LOCAL get_param_data_(const std::string & name);
+
+  /**
+   * @brief Logs a parameter update event.
+   *
+   * @param p Parameter to be logged.
+   */
   void PARAMS_MANAGER_LOCAL log_update_(const rclcpp::Parameter & param);
 };
 
