@@ -111,6 +111,12 @@ struct PARAMS_MANAGER_LOCAL PMComparator
 class PARAMS_MANAGER_PUBLIC Manager
 {
 public:
+  using SharedPtr = std::shared_ptr<Manager>;
+  using WeakPtr = std::weak_ptr<Manager>;
+  using UniquePtr = std::unique_ptr<Manager>;
+  using ConstSharedPtr = std::shared_ptr<const Manager>;
+  using ConstWeakPtr = std::weak_ptr<const Manager>;
+
   /**
    * Constructor.
    *
@@ -318,8 +324,6 @@ public:
     std::string && desc, std::string && constraints, bool read_only,
     std::vector<uint8_t> * var = nullptr,
     Validator && validator = nullptr);
-
-  typedef std::shared_ptr<Manager> SharedPtr;
 
 private:
   /* Operational flags. */
