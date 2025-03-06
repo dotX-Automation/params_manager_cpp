@@ -80,7 +80,7 @@ void Manager::add_to_set_(
 
 void Manager::log_update_(const rclcpp::Parameter & p)
 {
-  std::string msg = "'" + p.get_name() + "': ";
+  std::string msg = "[PARAM] '" + p.get_name() + "': ";
   switch (static_cast<PType>(p.get_type())) {
     case PType::PARAMETER_BOOL:
       msg += p.as_bool() ? "true" : "false";
