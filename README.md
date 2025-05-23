@@ -6,7 +6,7 @@ Library to easily manage ROS 2 node parameters through the `rclcpp` C++ API.
 
 If you tried to declare, set, and overall manage a node parameter using the full capabilities of the `rclcpp` API, you know it can be a bit of a pain. This library aims to ease the process by providing a simple interface to do so.
 
-The main problem of the `rclcpp` is the vast amount of boilerplate code required to declare a parameter, and check its updates during the `on_set_parameters_callback` if required. This library offers an interface to automate all steps, while still provide means to customize the behaviour of the node when the parameter is updated.
+The main problem of the `rclcpp` is the vast amount of boilerplate code required to declare a parameter, and check its updates during the `on_set_parameters_callback` if required. This library offers an interface to automate all steps, while still provide means to customize the behavior of the node when the parameter is updated.
 
 ## Limitations
 
@@ -19,7 +19,7 @@ Two sets of operations must be performed to implement node parameters for a node
 
 ### Modifying the node
 
-First, you must import the library in your node class, including the `params_manager.hpp` header file. Then you must declare a `Manager` object in your node class, and initialize it in the constructor, passing to it:
+First, you must import the library in your node class, including the `params_manager.hpp` header file. Then, you must declare a `Manager` object in your node class, and initialize it in the constructor, passing to it:
 
 - the pointer to the node object that manages the `Manager`;
 - a boolean flag that activates verbose logs upon events such as parameter updates.
@@ -41,6 +41,12 @@ bool your_validator(const rclcpp::Parameter &);
 ```
 
 that has to return `true` if the parameter is valid, `false` otherwise. The library approves a parameter update only if all the validators of the parameters involved in the update, if present, return `true`.
+
+With validators and member variables, you have the following options:
+
+- you may specify a member variable without a validator to update the parameter value directly;
+- you may specify a validator but not a member variable, to fully control the parameter update yourself (note that this does not prevent you from having a member variable that you update in your validator);
+- you may specify both a member variable and a validator, in which case the library will update the member variable with the new value only if the validator returns `true`.
 
 ### Setting up code generation
 
@@ -129,6 +135,7 @@ params:
     description: "Names list"
     constraints: "Cannot be changed"
     read_only: true
+    var_name: names_
     validator: function_name99 # This is optional
 
   bools:

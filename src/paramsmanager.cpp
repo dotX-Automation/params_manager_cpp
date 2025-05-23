@@ -180,10 +180,6 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
     // Check if the parameter is declared and get its data
     std::shared_ptr<ParamData> data = get_param_data_(p.get_name());
     if (!data) {
-      RCLCPP_INFO(
-        node_->get_logger(),
-        "Parameter '%s' unknown to manager",
-        p.get_name().c_str());
       continue;
     }
 
@@ -195,6 +191,17 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
         p.get_name().c_str());
       res.set__successful(false);
       res.set__reason("Parameter '" + p.get_name() + "' type mismatch");
+      return res;
+    }
+
+    // Run validator, if present
+    if (data->validator_ && !data->validator_(p)) {
+      RCLCPP_ERROR(
+        node_->get_logger(),
+        "Parameter '%s' update validation failed",
+        p.get_name().c_str());
+      res.set__successful(false);
+      res.set__reason("Parameter '" + p.get_name() + "' update validation failed");
       return res;
     }
 
@@ -232,17 +239,6 @@ rcl_interfaces::msg::SetParametersResult Manager::on_set_parameters_callback_(
           RCLCPP_ERROR(node_->get_logger(), "Unknown parameter type");
           break;
       }
-    }
-
-    // Run validator, if present
-    if (data->validator_ && !data->validator_(p)) {
-      RCLCPP_ERROR(
-        node_->get_logger(),
-        "Parameter '%s' validation failed",
-        p.get_name().c_str());
-      res.set__successful(false);
-      res.set__reason("Parameter '" + p.get_name() + "' validation failed");
-      return res;
     }
 
     // Log update
